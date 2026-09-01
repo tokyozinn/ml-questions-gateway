@@ -34,17 +34,17 @@ Legenda: `[ ]` pendente | `[~]` em progresso | `[x]` concluído
 
 ---
 
-## Épico 2 — Multi-tenant + OAuth
+## Épico 2 — Multi-tenant + OAuth `[x]`
 
 **Objetivo:** criar tenant, gerar connect link, completar OAuth ML.
 
 | ID | Tipo | Descrição | Status | Branch |
 |---|---|---|---|---|
-| E2-US1 | História | Como operador, quero criar tenant e enviar link de conexão ML | [ ] | `feature/e2-oauth` |
-| E2-T1 | Task | Prisma schema: Tenant, OAuthToken | [ ] | |
-| E2-T2 | Task | `POST/GET /api/v1/tenants` (admin API) | [ ] | |
-| E2-T3 | Task | `GET /connect/{tenant_id}` + `GET /auth/callback` | [ ] | |
-| E2-T4 | Task | Token manager (save + refresh básico) | [ ] | |
+| E2-US1 | História | Como operador, quero criar tenant e enviar link de conexão ML | [x] | `feature/e2-oauth` |
+| E2-T1 | Task | Prisma schema: Tenant, OAuthToken | [x] | |
+| E2-T2 | Task | `POST/GET /api/v1/tenants` (admin API) | [x] | |
+| E2-T3 | Task | `GET /connect/{tenant_id}` + `GET /auth/callback` | [x] | |
+| E2-T4 | Task | Token manager (save + refresh básico) | [x] | |
 
 **Ação manual (coordenador):** configurar Redirect URI no DevCenter ML
 
