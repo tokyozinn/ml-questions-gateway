@@ -1,0 +1,35 @@
+---
+description: Gitflow, PRs e fluxo de entrega por etapas
+alwaysApply: true
+---
+
+# Gitflow e Entrega
+
+## Branches
+
+| Branch | Uso |
+|---|---|
+| `main` | Produção — só via PR aprovado |
+| `develop` | Integração — base para features |
+| `feature/*` | Uma feature/épico por branch |
+| `release/*` | Preparação de release |
+| `hotfix/*` | Correções urgentes em produção |
+
+## Fluxo obrigatório
+
+1. Criar épico/história/task em `docs/ROADMAP.md`
+2. Branch `feature/{epic}-{descricao}` a partir de `develop`
+3. Implementar **apenas o escopo da task atual**
+4. Abrir PR → `develop` (ou `main` para hotfix)
+5. Merge após revisão do coordenador
+6. Fechar task no ROADMAP
+
+## PRs
+
+- Título: `[EPIC-XX] Descrição curta`
+- Corpo: o que mudou, ADRs relacionados, como testar
+- Nunca push direto em `main` ou `develop`
+
+## Etapas do MVP (não pular)
+
+Ver `docs/ROADMAP.md` — implementar na ordem definida.

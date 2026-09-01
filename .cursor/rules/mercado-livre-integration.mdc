@@ -1,0 +1,27 @@
+---
+description: Integrações Mercado Livre — sempre consultar MCP antes de implementar
+globs: "**/{mlClient,tokenManager,questionProcessor,notifications,gateway,answerEngine}*"
+alwaysApply: false
+---
+
+# Integração Mercado Livre
+
+Antes de **qualquer** implementação ou alteração de integração ML:
+
+1. Consultar MCP `user-mercadolibre-mcp-server` (`search_documentation` + `get_documentation_page`)
+2. Confirmar endpoints, parâmetros e `api_version` na doc oficial
+3. Registrar descobertas relevantes em ADR se mudar comportamento
+
+## Endpoints críticos (SOT §8.3)
+
+- `GET /questions/{id}?api_version=4`
+- `GET /items/{item_id}` — **obrigatório** para Product Context (§5.7)
+- `POST /answers` — body: `{question_id, text}`, max 2000 chars
+- `POST /oauth/token` — refresh single-use, expira 6h
+- Webhook: responder HTTP 200 em ≤500ms, processar async
+
+## Regras
+
+- Token refresh: job agendado + lazy-refresh no 401
+- Idempotência: nunca responder mesma `question_id` duas vezes
+- Rate limit: respeitar cota compartilhada do app (P0 futuro)

@@ -1,0 +1,36 @@
+---
+description: Governança do projeto — coordenador é o decisor final
+alwaysApply: true
+---
+
+# Governança — Coordenador do Projeto
+
+O **coordenador** (Andre) é o decisor final de todas as escolhas de produto, negócio e arquitetura.
+
+## Regras imprescindíveis
+
+1. **Nunca assumir** — se houver dúvida, ambiguidade ou múltiplas opções válidas, **perguntar ao coordenador** antes de agir.
+2. **Desenvolvimento em etapas** — não implementar tudo de uma vez. Uma etapa por vez, com aprovação entre etapas.
+3. **Entrega rápida** — priorizar MVP funcional sobre perfeição. Go-live com demo ao cliente é o objetivo imediato.
+4. **Toda decisão vira ADR** — antes de implementar, registrar em `docs/adrs/business/` (negócio) ou `docs/adrs/technical/` (técnica).
+5. **SOT é a fonte da verdade** — mudança de comportamento → atualizar `docs/SOT.md` (incrementar versão) + ADR.
+
+## Escalonamento obrigatório ao coordenador
+
+- Pontos de risco (segurança, CDC, rate limit ML, homologação)
+- Mudanças de escopo ou prioridade
+- Escolha de provedores externos (deploy, IA, billing)
+- Credenciais e configurações manuais
+- Qualquer item marcado 🔴 na matriz de prontidão (SOT §12)
+
+## Ações manuais vs. ecossistema Cursor
+
+| Automático (Cursor/agent) | Manual (coordenador) |
+|---|---|
+| Código, testes, PRs, ADRs, SOT | Criar app no DevCenter ML |
+| Commits em feature branches | Fornecer credenciais ML/OpenAI |
+| Revisar doc ML via MCP | Configurar ngrok/tunnel |
+| Scaffold do projeto | Aprovar ADRs `proposed` |
+| | Deploy em produção final |
+
+Sinalizar claramente quando uma ação depende do coordenador.

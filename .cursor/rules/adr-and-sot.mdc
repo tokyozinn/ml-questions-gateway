@@ -1,0 +1,28 @@
+---
+description: Processo de ADRs e atualização da SOT
+alwaysApply: true
+---
+
+# ADRs e SOT
+
+## Quando criar ADR
+
+- Decisão de negócio (escopo, pricing, compliance, prioridade) → `docs/adrs/business/ADR-BIZ-NNN-*.md`
+- Decisão técnica (stack, arquitetura, integração, padrão) → `docs/adrs/technical/ADR-TECH-NNN-*.md`
+
+## Fluxo
+
+1. Identificar decisão → escalar ao coordenador se não for trivial
+2. Criar ADR com status `proposed`
+3. Coordenador aprova → status `accepted`
+4. Se mudar comportamento do produto → atualizar `docs/SOT.md` (incrementar versão semver do doc)
+5. Atualizar índice em `docs/adrs/README.md`
+6. Só então implementar
+
+## Formato ADR
+
+Status, data, decisor, contexto, decisão, consequências, alternativas, referências.
+
+## SOT
+
+`docs/SOT.md` é language-agnostic. Stack de referência em §14. Nunca alterar SOT sem ADR correspondente.
