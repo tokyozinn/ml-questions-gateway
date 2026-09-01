@@ -9,6 +9,7 @@ Gateway SaaS multi-tenant de automação de respostas a perguntas do Mercado Liv
 | [docs/SOT.md](docs/SOT.md) | Source of Truth (spec completa) — **v1.2.0** |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Épicos, histórias e tasks |
 | [docs/adrs/](docs/adrs/) | Architecture Decision Records |
+| [docs/DEPLOY-DEMO.md](docs/DEPLOY-DEMO.md) | Guia de demo go-live (ngrok) |
 
 ## Stack (referência)
 
@@ -19,7 +20,7 @@ Gateway SaaS multi-tenant de automação de respostas a perguntas do Mercado Liv
 
 ## Status
 
-**Etapa 3 — Webhook + IA** concluída. Próximo: **Épico 4 — Demo go-live**. Ver [ROADMAP](docs/ROADMAP.md).
+**MVP demo pronto.** Siga o [guia de go-live](docs/DEPLOY-DEMO.md) para demonstração ao cliente.
 
 ## Governança
 

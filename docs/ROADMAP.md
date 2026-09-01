@@ -68,16 +68,16 @@ Legenda: `[ ]` pendente | `[~]` em progresso | `[x]` concluído
 
 ---
 
-## Épico 4 — Demo go-live
+## Épico 4 — Demo go-live `[x]`
 
 **Objetivo:** demonstração funcional ao cliente.
 
 | ID | Tipo | Descrição | Status | Branch |
 |---|---|---|---|---|
-| E4-US1 | História | Como operador, quero ver tenants e escalonamentos no painel admin básico | [ ] | `feature/e4-demo` |
-| E4-T1 | Task | Admin UI mínima (`/admin`) | [ ] | |
-| E4-T2 | Task | Script de teste end-to-end documentado | [ ] | |
-| E4-T3 | Task | ngrok setup guide em `docs/DEPLOY-DEMO.md` | [ ] | |
+| E4-US1 | História | Como operador, quero ver tenants e escalonamentos no painel admin básico | [x] | `feature/e4-demo` |
+| E4-T1 | Task | Admin UI mínima (`/admin`) | [x] | |
+| E4-T2 | Task | Script de teste end-to-end documentado | [x] | |
+| E4-T3 | Task | ngrok setup guide em `docs/DEPLOY-DEMO.md` | [x] | |
 
 ---
 

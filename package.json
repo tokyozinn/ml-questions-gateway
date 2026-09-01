@@ -14,7 +14,8 @@
     "typecheck": "prisma generate && tsc --noEmit",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "demo:test": "powershell -File scripts/demo-test.ps1"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
