@@ -36,6 +36,36 @@ model Tenant {
   @@map("tenants")
 }
 
+enum EscalationReason {
+  no_context
+  low_confidence
+  item_fetch_failed
+  sensitive_category
+}
+
+model ProcessedQuestion {
+  questionId   Int      @id @map("question_id")
+  sellerId     Int      @map("seller_id")
+  itemId       String   @map("item_id")
+  questionText String   @map("question_text")
+  answerText   String   @map("answer_text")
+  processedAt  DateTime @default(now()) @map("processed_at")
+
+  @@map("processed_questions")
+}
+
+model EscalatedQuestion {
+  questionId             Int              @id @map("question_id")
+  tenantId               String           @map("tenant_id")
+  itemId                 String           @map("item_id")
+  questionText           String           @map("question_text")
+  reason                 EscalationReason
+  productContextSnapshot String?          @map("product_context_snapshot")
+  escalatedAt            DateTime         @default(now()) @map("escalated_at")
+
+  @@map("escalated_questions")
+}
+
 model OAuthToken {
   userId       Int      @id @map("user_id")
   accessToken  String   @map("access_token")

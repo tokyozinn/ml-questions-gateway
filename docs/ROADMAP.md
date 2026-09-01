@@ -50,19 +50,19 @@ Legenda: `[ ]` pendente | `[~]` em progresso | `[x]` concluído
 
 ---
 
-## Épico 3 — Webhook + Answer Engine IA
+## Épico 3 — Webhook + Answer Engine IA `[x]`
 
 **Objetivo:** receber pergunta ML, buscar contexto do produto, responder com IA ou escalar.
 
 | ID | Tipo | Descrição | Status | Branch |
 |---|---|---|---|---|
-| E3-US1 | História | Como tenant, quero que perguntas sejam respondidas automaticamente com base no meu anúncio | [ ] | `feature/e3-answer-engine` |
-| E3-US2 | História | Como tenant, quero ser avisado quando o sistema não conseguir responder | [ ] | |
-| E3-T1 | Task | `POST /notifications` (200 imediato + async) | [ ] | |
-| E3-T2 | Task | Product Context builder (`GET /items`) + cache | [ ] | |
-| E3-T3 | Task | Answer Engine IA-first (OpenAI) | [ ] | |
-| E3-T4 | Task | Escalonamento: `escalated_questions` + `GET /api/v1/escalations` | [ ] | |
-| E3-T5 | Task | Idempotência (`processed_questions`) | [ ] | |
+| E3-US1 | História | Como tenant, quero que perguntas sejam respondidas automaticamente com base no meu anúncio | [x] | `feature/e3-answer-engine` |
+| E3-US2 | História | Como tenant, quero ser avisado quando o sistema não conseguir responder | [x] | |
+| E3-T1 | Task | `POST /notifications` (200 imediato + async) | [x] | |
+| E3-T2 | Task | Product Context builder (`GET /items`) + cache | [x] | |
+| E3-T3 | Task | Answer Engine IA-first (OpenAI) | [x] | |
+| E3-T4 | Task | Escalonamento: `escalated_questions` + `GET /api/v1/escalations` | [x] | |
+| E3-T5 | Task | Idempotência (`processed_questions`) | [x] | |
 
 **Ação manual (coordenador):** configurar Notification URL no DevCenter + ngrok
 

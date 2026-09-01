@@ -4,7 +4,7 @@ import { createApiKeyGuard } from "../plugins/apiKeyGuard.js";
 import { tenantCreateSchema, tenantUpdateSchema } from "../schemas/tenant.js";
 import { MlClient } from "../services/mlClient.js";
 import { TenantService } from "../services/tenantService.js";
-import { TokenManager } from "../services/tokenManager.js";
+import { TokenManager, listEscalations } from "../services/tokenManager.js";
 
 export async function registerGatewayRoutes(
   app: FastifyInstance,
@@ -13,7 +13,7 @@ export async function registerGatewayRoutes(
   const apiKeyGuard = createApiKeyGuard(config);
   const tenantService = new TenantService(config);
   const mlClient = new MlClient(config);
-  const tokenManager = new TokenManager();
+  const tokenManager = new TokenManager(mlClient);
 
   app.post(
     "/api/v1/tenants",
@@ -85,6 +85,23 @@ export async function registerGatewayRoutes(
       } catch {
         return reply.code(404).send({ error: "Tenant not found" });
       }
+    },
+  );
+
+  app.get(
+    "/api/v1/escalations",
+    { preHandler: apiKeyGuard },
+    async () => {
+      const escalations = await listEscalations();
+      return escalations.map((e) => ({
+        question_id: e.questionId,
+        tenant_id: e.tenantId,
+        item_id: e.itemId,
+        question_text: e.questionText,
+        reason: e.reason,
+        product_context_snapshot: e.productContextSnapshot,
+        escalated_at: e.escalatedAt.toISOString(),
+      }));
     },
   );
 

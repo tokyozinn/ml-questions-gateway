@@ -3,6 +3,7 @@ import { dirname } from "node:path";
 import Fastify from "fastify";
 import { loadConfig } from "./config.js";
 import { registerGatewayRoutes } from "./routes/gateway.js";
+import { registerNotificationRoutes } from "./routes/notifications.js";
 
 const config = loadConfig();
 
@@ -20,6 +21,7 @@ app.get("/health", async () => ({
 }));
 
 await registerGatewayRoutes(app, config);
+await registerNotificationRoutes(app, config);
 
 async function start() {
   try {
