@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ML Questions Gateway — Admin</title>
+  <style>
+    :root { --bg: #0f1419; --card: #1a2332; --border: #2d3a4d; --text: #e7ecf3; --muted: #8b9cb3; --accent: #3483fa; --ok: #00a650; --warn: #f73; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 2rem; max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
+    h2 { font-size: 1rem; margin-bottom: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.25rem; }
+    input, button { font: inherit; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+    input { width: 100%; margin-bottom: 0.75rem; }
+    button { background: var(--accent); border-color: var(--accent); color: #fff; cursor: pointer; font-weight: 600; }
+    button:hover { opacity: 0.9; }
+    button.secondary { background: transparent; border-color: var(--border); color: var(--text); }
+    .row { display: flex; gap: 0.5rem; align-items: end; flex-wrap: wrap; }
+    .row input { flex: 1; margin-bottom: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 500; }
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge-pending { background: #3d3520; color: #f5c518; }
+    .badge-active { background: #1a3d28; color: var(--ok); }
+    .badge-suspended { background: #3d2020; color: var(--warn); }
+    .badge-disconnected { background: #2d3a4d; color: var(--muted); }
+    a { color: var(--accent); }
+    .error { color: var(--warn); font-size: 0.85rem; margin-top: 0.5rem; }
+    .hidden { display: none; }
+    #auth-section { max-width: 400px; }
+  </style>
+</head>
+<body>
+  <h1>ML Questions Gateway</h1>
+  <p class="subtitle">Painel do operador — MVP demo</p>
+
+  <div id="auth-section" class="card">
+    <h2>Autenticação</h2>
+    <label for="api-key">API Key (GATEWAY_API_KEY)</label>
+    <input id="api-key" type="password" placeholder="Sua chave de API" />
+    <button onclick="saveApiKey()">Entrar</button>
+    <p id="auth-error" class="error hidden"></p>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <div class="card">
+      <h2>Novo tenant</h2>
+      <div class="row">
+        <div style="flex:1">
+          <label for="tenant-name">Nome comercial</label>
+          <input id="tenant-name" placeholder="Ex: Loja do João" />
+        </div>
+        <button onclick="createTenant()">Criar</button>
+      </div>
+      <p id="create-error" class="error hidden"></p>
+    </div>
+
+    <div class="card">
+      <h2>Tenants <button class="secondary" onclick="loadTenants()" style="float:right;padding:0.25rem 0.5rem;font-size:0.75rem">Atualizar</button></h2>
+      <table>
+        <thead>
+          <tr><th>Nome</th><th>Status</th><th>ML ID</th><th>Conexão</th></tr>
+        </thead>
+        <tbody id="tenants-body"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Escalonamentos <button class="secondary" onclick="loadEscalations()" style="float:right;padding:0.25rem 0.5rem;font-size:0.75rem">Atualizar</button></h2>
+      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem">Perguntas que a IA não conseguiu responder — seller deve responder manualmente no ML.</p>
+      <table>
+        <thead>
+          <tr><th>Pergunta</th><th>Item</th><th>Motivo</th><th>Data</th></tr>
+        </thead>
+        <tbody id="escalations-body"></tbody>
+      </table>
+    </div>
+
+    <button class="secondary" onclick="logout()">Sair</button>
+  </div>
+
+  <script>
+    const API_KEY_STORAGE = 'gateway_api_key';
+
+    function getApiKey() {
+      return sessionStorage.getItem(API_KEY_STORAGE);
+    }
+
+    function headers() {
+      return { 'X-API-Key': getApiKey(), 'Content-Type': 'application/json' };
+    }
+
+    async function api(path, options = {}) {
+      const res = await fetch(path, { ...options, headers: { ...headers(), ...options.headers } });
+      if (res.status === 401) { logout(); throw new Error('API key inválida'); }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Erro ${res.status}`);
+      }
+      return res.json();
+    }
+
+    function statusBadge(status) {
+      return `<span class="badge badge-${status}">${status}</span>`;
+    }
+
+    async function saveApiKey() {
+      const key = document.getElementById('api-key').value.trim();
+      if (!key) return;
+      sessionStorage.setItem(API_KEY_STORAGE, key);
+      try {
+        await api('/api/v1/tenants');
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        loadTenants();
+        loadEscalations();
+      } catch (e) {
+        sessionStorage.removeItem(API_KEY_STORAGE);
+        const el = document.getElementById('auth-error');
+        el.textContent = e.message;
+        el.classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem(API_KEY_STORAGE);
+      location.reload();
+    }
+
+    async function loadTenants() {
+      const tenants = await api('/api/v1/tenants');
+      const tbody = document.getElementById('tenants-body');
+      tbody.innerHTML = tenants.map(t => `
+        <tr>
+          <td>${t.name}</td>
+          <td>${statusBadge(t.status)}</td>
+          <td>${t.ml_user_id ?? '—'}</td>
+          <td>${t.connect_url ? `<a href="${t.connect_url}" target="_blank">Conectar ML</a>` : '—'}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="4" style="color:var(--muted)">Nenhum tenant</td></tr>';
+    }
+
+    async function loadEscalations() {
+      const items = await api('/api/v1/escalations');
+      const tbody = document.getElementById('escalations-body');
+      tbody.innerHTML = items.map(e => `
+        <tr>
+          <td>${e.question_text.slice(0, 80)}${e.question_text.length > 80 ? '…' : ''}</td>
+          <td>${e.item_id}</td>
+          <td>${e.reason}</td>
+          <td>${new Date(e.escalated_at).toLocaleString('pt-BR')}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="4" style="color:var(--muted)">Nenhum escalonamento</td></tr>';
+    }
+
+    async function createTenant() {
+      const name = document.getElementById('tenant-name').value.trim();
+      const errEl = document.getElementById('create-error');
+      errEl.classList.add('hidden');
+      if (!name) return;
+      try {
+        const tenant = await api('/api/v1/tenants', {
+          method: 'POST',
+          body: JSON.stringify({ name }),
+        });
+        document.getElementById('tenant-name').value = '';
+        await loadTenants();
+        if (tenant.connect_url) {
+          window.open(tenant.connect_url, '_blank');
+        }
+      } catch (e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    if (getApiKey()) {
+      document.getElementById('api-key').value = getApiKey();
+      saveApiKey();
+    }
+  </script>
+</body>
+</html>

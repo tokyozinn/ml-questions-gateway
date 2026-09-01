@@ -4,6 +4,7 @@ import Fastify from "fastify";
 import { loadConfig } from "./config.js";
 import { registerGatewayRoutes } from "./routes/gateway.js";
 import { registerNotificationRoutes } from "./routes/notifications.js";
+import { registerAdminPanelRoutes } from "./routes/adminPanel.js";
 
 const config = loadConfig();
 
@@ -22,6 +23,7 @@ app.get("/health", async () => ({
 
 await registerGatewayRoutes(app, config);
 await registerNotificationRoutes(app, config);
+await registerAdminPanelRoutes(app);
 
 async function start() {
   try {
