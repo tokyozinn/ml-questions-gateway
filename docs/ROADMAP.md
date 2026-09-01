@@ -18,17 +18,17 @@ Legenda: `[ ]` pendente | `[~]` em progresso | `[x]` concluído
 
 ---
 
-## Épico 1 — Fundação (MVP demo) `[~]`
+## Épico 1 — Fundação (MVP demo) `[x]`
 
 **Objetivo:** servidor rodando local + ngrok, health check, config.
 
 | ID | Tipo | Descrição | Status | Branch |
 |---|---|---|---|---|
-| E1-US1 | História | Como operador, quero iniciar o servidor com variáveis validadas | [~] | `feature/e1-foundation` |
-| E1-T1 | Task | Scaffold Node 22 + TypeScript + Fastify | [~] | |
-| E1-T2 | Task | `config.ts` com Zod (env vars SOT §9) | [~] | |
-| E1-T3 | Task | `GET /` e `GET /health` | [~] | |
-| E1-T4 | Task | `.env.example` documentado | [~] | |
+| E1-US1 | História | Como operador, quero iniciar o servidor com variáveis validadas | [x] | `feature/e1-foundation` |
+| E1-T1 | Task | Scaffold Node 22 + TypeScript + Fastify | [x] | |
+| E1-T2 | Task | `config.ts` com Zod (env vars SOT §9) | [x] | |
+| E1-T3 | Task | `GET /` e `GET /health` | [x] | |
+| E1-T4 | Task | `.env.example` documentado | [x] | |
 
 **Ação manual (coordenador):** fornecer credenciais ML + OpenAI no `.env`
 
