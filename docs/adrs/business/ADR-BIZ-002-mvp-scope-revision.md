@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Status | **proposed** |
+| Status | **accepted** |
 | Data | 2026-09-01 |
 | Decisor | Coordenador do projeto |
 | Categoria | Negócio |

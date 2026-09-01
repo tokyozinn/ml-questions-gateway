@@ -30,8 +30,8 @@ Gateway SaaS multi-tenant de automação de respostas a perguntas do Mercado Liv
 
 ## Ações manuais do coordenador
 
-- [ ] Aprovar ADR-BIZ-002 (escopo MVP revisado)
-- [ ] Aprovar ADR-TECH-002 (canal de escalonamento)
+- [x] Aprovar ADR-BIZ-002 (escopo MVP revisado)
+- [x] Aprovar ADR-TECH-002 (canal de escalonamento)
 - [ ] Fornecer credenciais ML DevCenter
 - [ ] Fornecer `OPENAI_API_KEY`
 - [ ] Configurar ngrok para demo

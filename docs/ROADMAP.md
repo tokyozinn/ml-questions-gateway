@@ -10,25 +10,25 @@ Legenda: `[ ]` pendente | `[~]` em progresso | `[x]` concluído
 
 | ID | Tipo | Descrição | Status |
 |---|---|---|---|
-| E0-T1 | Task | Criar repo GitHub + estrutura base | [~] |
+| E0-T1 | Task | Criar repo GitHub + estrutura base | [x] |
 | E0-T2 | Task | Cursor rules + ADRs iniciais | [x] |
 | E0-T3 | Task | SOT v1.2.0 (IA-first + Product Context) | [x] |
-| E0-T4 | Task | Aprovar ADR-BIZ-002 (escopo MVP revisado) | [ ] |
-| E0-T5 | Task | Aprovar ADR-TECH-002 (canal de escalonamento) | [ ] |
+| E0-T4 | Task | Aprovar ADR-BIZ-002 (escopo MVP revisado) | [x] |
+| E0-T5 | Task | Aprovar ADR-TECH-002 (canal de escalonamento) | [x] |
 
 ---
 
-## Épico 1 — Fundação (MVP demo)
+## Épico 1 — Fundação (MVP demo) `[~]`
 
 **Objetivo:** servidor rodando local + ngrok, health check, config.
 
 | ID | Tipo | Descrição | Status | Branch |
 |---|---|---|---|---|
-| E1-US1 | História | Como operador, quero iniciar o servidor com variáveis validadas | [ ] | `feature/e1-foundation` |
-| E1-T1 | Task | Scaffold Node 22 + TypeScript + Fastify | [ ] | |
-| E1-T2 | Task | `config.ts` com Zod (env vars SOT §9) | [ ] | |
-| E1-T3 | Task | `GET /` e `GET /health` | [ ] | |
-| E1-T4 | Task | `.env.example` documentado | [ ] | |
+| E1-US1 | História | Como operador, quero iniciar o servidor com variáveis validadas | [~] | `feature/e1-foundation` |
+| E1-T1 | Task | Scaffold Node 22 + TypeScript + Fastify | [~] | |
+| E1-T2 | Task | `config.ts` com Zod (env vars SOT §9) | [~] | |
+| E1-T3 | Task | `GET /` e `GET /health` | [~] | |
+| E1-T4 | Task | `.env.example` documentado | [~] | |
 
 **Ação manual (coordenador):** fornecer credenciais ML + OpenAI no `.env`
 
