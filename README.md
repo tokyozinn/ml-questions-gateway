@@ -19,7 +19,7 @@ Gateway SaaS multi-tenant de automação de respostas a perguntas do Mercado Liv
 
 ## Status
 
-**Etapa 1 — Fundação** concluída. Próximo: **Épico 2 — OAuth**. Ver [ROADMAP](docs/ROADMAP.md).
+**Etapa 2 — OAuth** concluída. Próximo: **Épico 3 — Webhook + Answer Engine IA**. Ver [ROADMAP](docs/ROADMAP.md).
 
 ## Governança
 

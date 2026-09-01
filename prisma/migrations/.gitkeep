@@ -1,0 +1,2 @@
+# Prisma migrations are applied via `npm run db:push` in dev.
+# For production, use `prisma migrate deploy` with PostgreSQL.
