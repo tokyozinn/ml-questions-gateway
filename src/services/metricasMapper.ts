@@ -34,7 +34,7 @@ function translateAviso(err: {
   ) {
     return {
       fonte: "ads",
-      mensagem: "Product Ads não habilitado nesta conta",
+      mensagem: "Product Ads (PADS) não habilitado para este user_id ML",
       ...(err.status !== undefined && { status: err.status }),
     };
   }

@@ -170,6 +170,7 @@ export class MetricsAggregatorService {
             "ads_metrics",
             this.mlClient.getProductAdsCampaignMetrics(
               preferred.advertiser_id,
+              preferred.site_id,
               accessToken,
               dateFrom,
               dateTo,
@@ -303,7 +304,7 @@ export class MetricsAggregatorService {
         partialErrors.push({
           source: "ads",
           message:
-            "Product Ads not enabled for this seller (ML: enable under Mi perfil → Publicidad)",
+            "Product Ads (PADS) não habilitado para este user_id ML — confira a conta conectada no OAuth",
           status: 404,
         });
         return null;

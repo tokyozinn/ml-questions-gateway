@@ -146,12 +146,16 @@ export class MlClient {
     return this.authenticatedGet(
       "https://api.mercadolibre.com/advertising/advertisers?product_id=PADS",
       accessToken,
-      { "Api-Version": "1" },
+      {
+        "Api-Version": "1",
+        "Content-Type": "application/json",
+      },
     );
   }
 
   async getProductAdsCampaignMetrics(
     advertiserId: number,
+    siteId: string,
     accessToken: string,
     dateFrom: string,
     dateTo: string,
@@ -166,8 +170,9 @@ export class MlClient {
       metrics,
       metrics_summary: "true",
     });
+    // Legacy /advertising/advertisers/{id}/product_ads/campaigns was retired in 2026
     return this.authenticatedGet(
-      `https://api.mercadolibre.com/advertising/advertisers/${advertiserId}/product_ads/campaigns?${params}`,
+      `https://api.mercadolibre.com/advertising/${siteId}/advertisers/${advertiserId}/product_ads/campaigns/search?${params}`,
       accessToken,
       { "api-version": "2" },
     );
