@@ -54,13 +54,17 @@ function pickBillingPeriodKey(
   const fromMs = Date.parse(dateFrom);
   const toMs = Date.parse(dateTo);
 
-  const intersecting = results.find((r) => {
+  const sorted = [...results].sort(
+    (a, b) => Date.parse(b.period.date_to) - Date.parse(a.period.date_to),
+  );
+
+  const intersecting = sorted.find((r) => {
     const pFrom = Date.parse(r.period.date_from);
     const pTo = Date.parse(r.period.date_to);
     return pFrom <= toMs && pTo >= fromMs;
   });
 
-  return intersecting?.key ?? results[0]?.key ?? null;
+  return intersecting?.key ?? sorted[0]?.key ?? null;
 }
 
 function mapBillingItems(
@@ -149,11 +153,7 @@ export class MetricsAggregatorService {
           partialErrors,
         ),
         this.fetchOrders(mlUserId, accessToken, dateFrom, dateTo, partialErrors),
-        this.settle(
-          "ads",
-          this.mlClient.getAdvertisers(accessToken),
-          partialErrors,
-        ),
+        this.settleAds(accessToken, partialErrors),
       ]);
 
     let adsPayload: Record<string, unknown> | undefined;
@@ -288,6 +288,29 @@ export class MetricsAggregatorService {
     });
 
     return response;
+  }
+
+  private async settleAds(
+    accessToken: string,
+    partialErrors: PartialError[],
+  ): Promise<{
+    advertisers: Array<{ advertiser_id: number; site_id: string }>;
+  } | null> {
+    try {
+      return await this.mlClient.getAdvertisers(accessToken);
+    } catch (err) {
+      if (err instanceof MlApiError && err.status === 404) {
+        partialErrors.push({
+          source: "ads",
+          message:
+            "Product Ads not enabled for this seller (ML: enable under Mi perfil → Publicidad)",
+          status: 404,
+        });
+        return null;
+      }
+      partialErrors.push(toPartialError("ads", err));
+      return null;
+    }
   }
 
   private async settle<T>(

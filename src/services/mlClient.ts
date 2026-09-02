@@ -21,6 +21,21 @@ export class MlApiError extends Error {
   }
 }
 
+/** ML items_visits rejects trailing `Z`; requires offset form `-00:00`. */
+function toMlVisitDate(isoOrDate: string): string {
+  if (/Z$/i.test(isoOrDate)) {
+    return isoOrDate.replace(/Z$/i, "-00:00");
+  }
+  if (/[+-]\d{2}:\d{2}$/.test(isoOrDate)) {
+    return isoOrDate;
+  }
+  // YYYY-MM-DD → start-of-day UTC offset form
+  if (/^\d{4}-\d{2}-\d{2}$/.test(isoOrDate)) {
+    return `${isoOrDate}T00:00:00.000-00:00`;
+  }
+  return isoOrDate;
+}
+
 export class MlClient {
   constructor(private readonly config: Config) {}
 
@@ -118,9 +133,10 @@ export class MlClient {
     dateFrom: string,
     dateTo: string,
   ): Promise<{ total_visits: number }> {
+    // ML rejects `...Z`; docs require ISO with offset, e.g. `2026-08-03T00:00:00.000-00:00`
     const params = new URLSearchParams({
-      date_from: dateFrom,
-      date_to: dateTo,
+      date_from: toMlVisitDate(dateFrom),
+      date_to: toMlVisitDate(dateTo),
     });
     return this.authenticatedGet(
       `https://api.mercadolibre.com/users/${userId}/items_visits?${params}`,
@@ -181,8 +197,12 @@ export class MlClient {
     accessToken: string,
     periodKey: string,
   ): Promise<Record<string, unknown>> {
+    const params = new URLSearchParams({
+      group: "ML",
+      document_type: "BILL",
+    });
     return this.authenticatedGet(
-      `https://api.mercadolibre.com/billing/integration/periods/key/${periodKey}/summary/details?group=ML`,
+      `https://api.mercadolibre.com/billing/integration/periods/key/${periodKey}/summary/details?${params}`,
       accessToken,
     );
   }
