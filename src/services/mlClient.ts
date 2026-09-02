@@ -10,6 +10,17 @@ export interface MlTokenResponse {
   scope: string;
 }
 
+export class MlApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly body: string,
+  ) {
+    super(message);
+    this.name = "MlApiError";
+  }
+}
+
 export class MlClient {
   constructor(private readonly config: Config) {}
 
@@ -56,6 +67,126 @@ export class MlClient {
     );
   }
 
+  async getUser(
+    userId: number,
+    accessToken: string,
+  ): Promise<Record<string, unknown>> {
+    return this.authenticatedGet(
+      `https://api.mercadolibre.com/users/${userId}`,
+      accessToken,
+    );
+  }
+
+  async searchUserItems(
+    userId: number,
+    accessToken: string,
+  ): Promise<{ paging: { total: number }; results: string[] }> {
+    return this.authenticatedGet(
+      `https://api.mercadolibre.com/users/${userId}/items/search?limit=1`,
+      accessToken,
+    );
+  }
+
+  async searchOrders(
+    sellerId: number,
+    accessToken: string,
+    dateFrom: string,
+    dateTo: string,
+    offset = 0,
+    limit = 50,
+  ): Promise<{
+    paging: { total: number };
+    results: Array<Record<string, unknown>>;
+  }> {
+    const params = new URLSearchParams({
+      seller: String(sellerId),
+      sort: "date_desc",
+      limit: String(limit),
+      offset: String(offset),
+      "order.date_created.from": dateFrom,
+      "order.date_created.to": dateTo,
+    });
+    return this.authenticatedGet(
+      `https://api.mercadolibre.com/orders/search?${params}`,
+      accessToken,
+    );
+  }
+
+  async getUserItemsVisits(
+    userId: number,
+    accessToken: string,
+    dateFrom: string,
+    dateTo: string,
+  ): Promise<{ total_visits: number }> {
+    const params = new URLSearchParams({
+      date_from: dateFrom,
+      date_to: dateTo,
+    });
+    return this.authenticatedGet(
+      `https://api.mercadolibre.com/users/${userId}/items_visits?${params}`,
+      accessToken,
+    );
+  }
+
+  async getAdvertisers(
+    accessToken: string,
+  ): Promise<{
+    advertisers: Array<{ advertiser_id: number; site_id: string }>;
+  }> {
+    return this.authenticatedGet(
+      "https://api.mercadolibre.com/advertising/advertisers?product_id=PADS",
+      accessToken,
+      { "Api-Version": "1" },
+    );
+  }
+
+  async getProductAdsCampaignMetrics(
+    advertiserId: number,
+    accessToken: string,
+    dateFrom: string,
+    dateTo: string,
+  ): Promise<Record<string, unknown>> {
+    const metrics =
+      "clicks,prints,cost,roas,total_amount,direct_amount,indirect_amount,units_quantity,acos";
+    const params = new URLSearchParams({
+      limit: "50",
+      offset: "0",
+      date_from: dateFrom.slice(0, 10),
+      date_to: dateTo.slice(0, 10),
+      metrics,
+      metrics_summary: "true",
+    });
+    return this.authenticatedGet(
+      `https://api.mercadolibre.com/advertising/advertisers/${advertiserId}/product_ads/campaigns?${params}`,
+      accessToken,
+      { "api-version": "2" },
+    );
+  }
+
+  async getBillingPeriods(
+    accessToken: string,
+  ): Promise<{
+    results: Array<{
+      key: string;
+      period: { date_from: string; date_to: string };
+    }>;
+  }> {
+    return this.authenticatedGet(
+      "https://api.mercadolibre.com/billing/integration/monthly/periods?group=ML&document_type=BILL&limit=12",
+      accessToken,
+    );
+  }
+
+  async getBillingSummary(
+    accessToken: string,
+    periodKey: string,
+  ): Promise<Record<string, unknown>> {
+    return this.authenticatedGet(
+      `https://api.mercadolibre.com/billing/integration/periods/key/${periodKey}/summary/details?group=ML`,
+      accessToken,
+    );
+  }
+
   async postAnswer(
     questionId: number,
     text: string,
@@ -73,8 +204,10 @@ export class MlClient {
 
     if (!response.ok) {
       const errorBody = await response.text();
-      throw new Error(
+      throw new MlApiError(
         `ML post answer failed (${response.status}): ${errorBody}`,
+        response.status,
+        errorBody,
       );
     }
   }
@@ -82,17 +215,23 @@ export class MlClient {
   private async authenticatedGet<T>(
     url: string,
     accessToken: string,
+    extraHeaders: Record<string, string> = {},
   ): Promise<T> {
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         accept: "application/json",
+        ...extraHeaders,
       },
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
-      throw new Error(`ML API failed (${response.status}): ${errorBody}`);
+      throw new MlApiError(
+        `ML API failed (${response.status}): ${errorBody}`,
+        response.status,
+        errorBody,
+      );
     }
 
     return response.json() as Promise<T>;

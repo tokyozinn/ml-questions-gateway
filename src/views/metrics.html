@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Métricas Financeiras — ML Gateway</title>
+  <style>
+    :root { --bg: #0f1419; --card: #1a2332; --border: #2d3a4d; --text: #e7ecf3; --muted: #8b9cb3; --accent: #3483fa; --ok: #00a650; --warn: #f73; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 2rem; max-width: 1100px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--muted); margin-bottom: 1.5rem; font-size: 0.9rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
+    h2 { font-size: 1rem; margin-bottom: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.25rem; }
+    input, select, button { font: inherit; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+    input, select { width: 100%; margin-bottom: 0.75rem; }
+    button { background: var(--accent); border-color: var(--accent); color: #fff; cursor: pointer; font-weight: 600; }
+    button:hover { opacity: 0.9; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button.secondary { background: transparent; border-color: var(--border); color: var(--text); }
+    .row { display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap; }
+    .row > div { flex: 1; min-width: 140px; }
+    .period-group { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .period-group button { flex: 1; }
+    .period-group button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .period-group button:not(.active) { background: transparent; border-color: var(--border); color: var(--text); }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; }
+    .kpi { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+    .kpi .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .kpi .value { font-size: 1.25rem; font-weight: 700; margin-top: 0.25rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 500; }
+    a { color: var(--accent); }
+    .error { color: var(--warn); font-size: 0.85rem; margin-top: 0.5rem; }
+    .banner { background: #3d3520; border: 1px solid #f5c518; color: #f5c518; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; }
+    .banner ul { margin: 0.5rem 0 0 1.25rem; }
+    .hidden { display: none; }
+    .meta { color: var(--muted); font-size: 0.8rem; margin-bottom: 1rem; }
+    #auth-section { max-width: 400px; }
+  </style>
+</head>
+<body>
+  <h1>Métricas Financeiras</h1>
+  <p class="subtitle"><a href="/admin">← Admin</a> · Dashboard por tenant</p>
+
+  <div id="auth-section" class="card">
+    <h2>Autenticação</h2>
+    <label for="api-key">API Key (GATEWAY_API_KEY)</label>
+    <input id="api-key" type="password" placeholder="Sua chave de API" />
+    <button onclick="saveApiKey()">Entrar</button>
+    <p id="auth-error" class="error hidden"></p>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <div class="card">
+      <h2>Filtros</h2>
+      <div class="row">
+        <div>
+          <label for="tenant-select">Tenant conectado</label>
+          <select id="tenant-select"></select>
+        </div>
+        <div>
+          <label>Período</label>
+          <div class="period-group">
+            <button type="button" class="active" data-period="30" onclick="setPeriod(30)">30d</button>
+            <button type="button" data-period="60" onclick="setPeriod(60)">60d</button>
+            <button type="button" data-period="90" onclick="setPeriod(90)">90d</button>
+          </div>
+        </div>
+        <div style="flex:0">
+          <button id="load-btn" onclick="loadMetrics(true)">Atualizar</button>
+        </div>
+      </div>
+      <p id="load-error" class="error hidden"></p>
+    </div>
+
+    <div id="partial-banner" class="banner hidden"></div>
+
+    <div id="results" class="hidden">
+      <p id="meta" class="meta"></p>
+
+      <div class="card">
+        <h2>Financeiro</h2>
+        <div class="kpi-grid" id="kpi-grid"></div>
+      </div>
+
+      <div class="card">
+        <h2>Pedidos recentes</h2>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Status</th><th>Valor</th><th>Data</th></tr>
+          </thead>
+          <tbody id="orders-body"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Product Ads</h2>
+        <div id="ads-body"></div>
+      </div>
+
+      <div class="card">
+        <h2>Billing (comissões / cargos)</h2>
+        <div id="billing-body"></div>
+      </div>
+
+      <div class="card">
+        <h2>Reputação · Tráfego · Anúncios</h2>
+        <div id="ops-body"></div>
+      </div>
+    </div>
+
+    <button class="secondary" onclick="logout()">Sair</button>
+  </div>
+
+  <script>
+    const API_KEY_STORAGE = 'gateway_api_key';
+    let selectedPeriod = 30;
+
+    function getApiKey() {
+      return sessionStorage.getItem(API_KEY_STORAGE);
+    }
+
+    function headers() {
+      return { 'X-API-Key': getApiKey(), 'Content-Type': 'application/json' };
+    }
+
+    async function api(path, options = {}) {
+      const res = await fetch(path, { ...options, headers: { ...headers(), ...options.headers } });
+      if (res.status === 401) { logout(); throw new Error('API key inválida'); }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Erro ${res.status}`);
+      }
+      return res.json();
+    }
+
+    function money(value, currency = 'BRL') {
+      return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency });
+    }
+
+    function setPeriod(days) {
+      selectedPeriod = days;
+      document.querySelectorAll('.period-group button').forEach((btn) => {
+        btn.classList.toggle('active', Number(btn.dataset.period) === days);
+      });
+      loadMetrics(false);
+    }
+
+    async function saveApiKey() {
+      const key = document.getElementById('api-key').value.trim();
+      if (!key) return;
+      sessionStorage.setItem(API_KEY_STORAGE, key);
+      try {
+        await loadTenants();
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+      } catch (e) {
+        sessionStorage.removeItem(API_KEY_STORAGE);
+        const el = document.getElementById('auth-error');
+        el.textContent = e.message;
+        el.classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem(API_KEY_STORAGE);
+      location.reload();
+    }
+
+    async function loadTenants() {
+      const tenants = await api('/api/v1/tenants');
+      const connected = tenants.filter((t) => t.ml_user_id != null);
+      const select = document.getElementById('tenant-select');
+      select.innerHTML = connected.map((t) =>
+        `<option value="${t.id}">${t.name} (ML ${t.ml_user_id})</option>`
+      ).join('') || '<option value="">Nenhum tenant conectado</option>';
+      select.onchange = () => loadMetrics(false);
+      if (connected.length) await loadMetrics(false);
+    }
+
+    async function loadMetrics(forceRefresh) {
+      const tenantId = document.getElementById('tenant-select').value;
+      const errEl = document.getElementById('load-error');
+      errEl.classList.add('hidden');
+      if (!tenantId) return;
+
+      const btn = document.getElementById('load-btn');
+      btn.disabled = true;
+      btn.textContent = 'Carregando…';
+
+      try {
+        const refresh = forceRefresh ? '1' : '0';
+        const data = await api(`/api/v1/tenants/${tenantId}/metrics?period=${selectedPeriod}&refresh=${refresh}`);
+        renderMetrics(data);
+      } catch (e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove('hidden');
+        document.getElementById('results').classList.add('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Atualizar';
+      }
+    }
+
+    function renderMetrics(data) {
+      document.getElementById('results').classList.remove('hidden');
+      const currency = data.financial.currency_id || 'BRL';
+
+      document.getElementById('meta').textContent =
+        `${data.tenant_name} · ${data.period_days} dias · ${new Date(data.date_from).toLocaleDateString('pt-BR')} → ${new Date(data.date_to).toLocaleDateString('pt-BR')} · fetch ${new Date(data.fetched_at).toLocaleString('pt-BR')}${data.cached ? ' (cache)' : ''}`;
+
+      const banner = document.getElementById('partial-banner');
+      if (data.partial_errors?.length) {
+        banner.classList.remove('hidden');
+        banner.innerHTML = `<strong>Alguns blocos falharam:</strong><ul>${
+          data.partial_errors.map((e) => `<li>${e.source}: ${e.message}</li>`).join('')
+        }</ul>`;
+      } else {
+        banner.classList.add('hidden');
+        banner.innerHTML = '';
+      }
+
+      const f = data.financial;
+      document.getElementById('kpi-grid').innerHTML = [
+        ['Receita bruta', money(f.gross_revenue, currency)],
+        ['Pedidos pagos', String(f.orders_count)],
+        ['Ticket médio', money(f.avg_ticket, currency)],
+        ['Gasto Ads', money(f.ad_spend, currency)],
+        ['Comissões ML', money(f.ml_fees, currency)],
+        ['Receita líquida est.', money(f.net_revenue_estimated, currency)],
+        ['ROAS', f.roas.toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + 'x'],
+        ['Margem pós-ads', money(f.margin_after_ads, currency)],
+      ].map(([label, value]) =>
+        `<div class="kpi"><div class="label">${label}</div><div class="value">${value}</div></div>`
+      ).join('');
+
+      const orders = data.orders?.recent || [];
+      document.getElementById('orders-body').innerHTML = orders.length
+        ? orders.map((o) => `
+            <tr>
+              <td>${o.id ?? '—'}</td>
+              <td>${o.status ?? '—'}</td>
+              <td>${money(o.total_amount, o.currency_id || currency)}</td>
+              <td>${o.date_created ? new Date(o.date_created).toLocaleString('pt-BR') : '—'}</td>
+            </tr>
+          `).join('')
+        : '<tr><td colspan="4" style="color:var(--muted)">Nenhum pedido no período</td></tr>';
+
+      const adsEl = document.getElementById('ads-body');
+      if (!data.ads?.available) {
+        adsEl.innerHTML = '<p style="color:var(--muted)">Product Ads indisponível para esta conta.</p>';
+      } else {
+        const m = data.ads.metrics_summary || {};
+        adsEl.innerHTML = `
+          <p class="meta">Advertiser ID: ${data.ads.advertiser_id ?? '—'}</p>
+          <div class="kpi-grid">
+            <div class="kpi"><div class="label">Cost</div><div class="value">${money(m.cost, currency)}</div></div>
+            <div class="kpi"><div class="label">Clicks</div><div class="value">${m.clicks ?? '—'}</div></div>
+            <div class="kpi"><div class="label">ROAS</div><div class="value">${m.roas ?? '—'}</div></div>
+            <div class="kpi"><div class="label">Total amount</div><div class="value">${money(m.total_amount, currency)}</div></div>
+          </div>
+        `;
+      }
+
+      const billingEl = document.getElementById('billing-body');
+      if (!data.billing?.available) {
+        billingEl.innerHTML = '<p style="color:var(--muted)">Billing indisponível (verifique permissões do app ML).</p>';
+      } else {
+        const charges = data.billing.charges || [];
+        billingEl.innerHTML = `
+          <p class="meta">Período key: ${data.billing.period_key ?? '—'} · Total collected: ${money(data.billing.total_collected, currency)}</p>
+          <table>
+            <thead><tr><th>Cargo</th><th>Tipo</th><th>Valor</th></tr></thead>
+            <tbody>
+              ${charges.map((c) => `<tr><td>${c.label}</td><td>${c.type}</td><td>${money(c.amount, currency)}</td></tr>`).join('')
+                || '<tr><td colspan="3" style="color:var(--muted)">Sem cargos</td></tr>'}
+            </tbody>
+          </table>
+        `;
+      }
+
+      const rep = data.reputation || {};
+      document.getElementById('ops-body').innerHTML = `
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">Nível</div><div class="value">${rep.level_id ?? '—'}</div></div>
+          <div class="kpi"><div class="label">MercadoLíder</div><div class="value">${rep.power_seller_status ?? '—'}</div></div>
+          <div class="kpi"><div class="label">Visitas</div><div class="value">${(data.traffic?.total_visits ?? 0).toLocaleString('pt-BR')}</div></div>
+          <div class="kpi"><div class="label">Anúncios</div><div class="value">${data.listings?.active_count ?? 0}</div></div>
+        </div>
+      `;
+    }
+
+    if (getApiKey()) {
+      document.getElementById('api-key').value = getApiKey();
+      saveApiKey();
+    }
+  </script>
+</body>
+</html>

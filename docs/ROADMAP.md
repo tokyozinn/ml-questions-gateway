@@ -81,6 +81,25 @@ Legenda: `[ ]` pendente | `[~]` em progresso | `[x]` concluído
 
 ---
 
+## Épico 5 — Métricas Financeiras `[x]`
+
+**Objetivo:** dashboard admin com métricas completas por tenant, incluindo análise financeira (receita, ads, ROAS, billing).
+
+| ID | Tipo | Descrição | Status | Branch |
+|---|---|---|---|---|
+| E5-US1 | História | Como operador, quero ver métricas financeiras e operacionais de um tenant conectado | [x] | `feature/e5-metrics` |
+| E5-T1 | Task | Tipos + schema Zod + estender `MlClient` (users, orders, visits, ads, billing) | [x] | |
+| E5-T2 | Task | `FinancialCalculator` + `MetricsAggregatorService` (cache TTL 5 min) | [x] | |
+| E5-T3 | Task | `GET /api/v1/tenants/:id/metrics?period=30\|60\|90` | [x] | |
+| E5-T4 | Task | Página `/admin/metrics` + link no admin existente | [x] | |
+| E5-T5 | Task | ADR-BIZ-003 + ADR-TECH-003 aprovados; spec + plano documentados | [x] | |
+
+**Ação manual (coordenador):** habilitar permissões billing + Product Ads no DevCenter ML; reconectar OAuth do tenant.
+
+**ADRs:** ADR-BIZ-003, ADR-TECH-003 (proposed → accepted antes de merge)
+
+---
+
 ## Backlog pós-MVP (P0 SOT)
 
 - Fila BullMQ + Redis (retry)
