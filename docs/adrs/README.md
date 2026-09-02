@@ -39,6 +39,7 @@ ADR-{BIZ|TECH}-NNN-titulo-curto.md
 |---|---|---|
 | [ADR-BIZ-001](business/ADR-BIZ-001-ai-first-answer-strategy.md) | Estratégia de resposta IA-first com contexto do produto | accepted |
 | [ADR-BIZ-002](business/ADR-BIZ-002-mvp-scope-revision.md) | Revisão de escopo do MVP (inclui IA) | accepted |
+| [ADR-BIZ-003](business/ADR-BIZ-003-metrics-as-primary-product.md) | Métricas financeiras como produto principal | accepted |
 
 ### Técnica
 
@@ -46,3 +47,4 @@ ADR-{BIZ|TECH}-NNN-titulo-curto.md
 |---|---|---|
 | [ADR-TECH-001](technical/ADR-TECH-001-product-context-knowledge-base.md) | Base de conhecimento por produto (item ML) | accepted |
 | [ADR-TECH-002](technical/ADR-TECH-002-seller-escalation-channel.md) | Sinalização ao seller quando IA não responde | accepted |
+| [ADR-TECH-003](technical/ADR-TECH-003-ml-metrics-aggregator.md) | Agregador de métricas ML com cache TTL | accepted |
