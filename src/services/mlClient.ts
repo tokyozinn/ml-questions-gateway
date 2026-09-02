@@ -30,6 +30,10 @@ function toMlVisitDate(isoOrDate: string): string {
   return day;
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export class MlClient {
   constructor(private readonly config: Config) {}
 
@@ -236,24 +240,45 @@ export class MlClient {
     accessToken: string,
     extraHeaders: Record<string, string> = {},
   ): Promise<T> {
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        accept: "application/json",
-        ...extraHeaders,
-      },
-    });
+    const maxAttempts = 4;
+    let lastError: MlApiError | undefined;
 
-    if (!response.ok) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          accept: "application/json",
+          ...extraHeaders,
+        },
+      });
+
+      if (response.ok) {
+        return response.json() as Promise<T>;
+      }
+
       const errorBody = await response.text();
-      throw new MlApiError(
+      lastError = new MlApiError(
         `ML API failed (${response.status}): ${errorBody}`,
         response.status,
         errorBody,
       );
+
+      const retryable = response.status === 429 || response.status === 503;
+      if (!retryable || attempt === maxAttempts) {
+        throw lastError;
+      }
+
+      const retryAfterHeader = response.headers.get("retry-after");
+      const retryAfterSec = retryAfterHeader
+        ? Number.parseInt(retryAfterHeader, 10)
+        : NaN;
+      const backoffMs = Number.isFinite(retryAfterSec)
+        ? Math.max(retryAfterSec, 1) * 1000
+        : 500 * 2 ** (attempt - 1);
+      await sleep(backoffMs);
     }
 
-    return response.json() as Promise<T>;
+    throw lastError ?? new MlApiError("ML API failed", 500, "");
   }
 
   private async requestToken(

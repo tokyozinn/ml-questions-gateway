@@ -130,7 +130,16 @@ export class MetricsAggregatorService {
     const partialErrors: PartialError[] = [];
     const mlUserId = tenant.mlUserId;
 
-    const [userResult, itemsResult, visitsResult, ordersBundle, advertisersResult] =
+    // Orders first (drives vendas KPIs) to avoid losing them to parallel 429 bursts
+    const ordersBundle = await this.fetchOrders(
+      mlUserId,
+      accessToken,
+      dateFrom,
+      dateTo,
+      partialErrors,
+    );
+
+    const [userResult, itemsResult, visitsResult, advertisersResult] =
       await Promise.all([
         this.settle(
           "reputation",
@@ -152,7 +161,6 @@ export class MetricsAggregatorService {
           ),
           partialErrors,
         ),
-        this.fetchOrders(mlUserId, accessToken, dateFrom, dateTo, partialErrors),
         this.settleAds(accessToken, partialErrors),
       ]);
 
