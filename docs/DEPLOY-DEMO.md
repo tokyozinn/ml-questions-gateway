@@ -107,7 +107,28 @@ Abra: `https://{ngrok}/admin`
 3. Simular POST /notifications com question_id real
 4. Verificar resposta publicada no anúncio ML
 5. Verificar escalonamentos em GET /api/v1/escalations
+6. (Integração) GET /api/v1/tenants/{id}/metricas?periodo=30
 ```
+
+## 7. API `/metricas` (consumo externo)
+
+Contrato em português para outro sistema (ADR-TECH-004). Auth: mesma `X-API-Key`.
+
+```powershell
+$tenantId = "UUID-DO-TENANT"
+$apiKey = "sua-GATEWAY_API_KEY"
+Invoke-RestMethod -Headers @{ "X-API-Key" = $apiKey } `
+  -Uri "http://localhost:8000/api/v1/tenants/$tenantId/metricas?periodo=30"
+```
+
+Via ngrok:
+
+```powershell
+Invoke-RestMethod -Headers @{ "X-API-Key" = $apiKey } `
+  -Uri "https://{ngrok}/api/v1/tenants/$tenantId/metricas?periodo=30&refresh=1"
+```
+
+Resposta inclui `vendas`, `investimento`, `custos_ml`, `resultado`, `trafego`, `anuncios`, `avisos`. Spec: `docs/superpowers/specs/2026-09-02-tenant-metricas-api-design.md`.
 
 ## Ações manuais do coordenador
 

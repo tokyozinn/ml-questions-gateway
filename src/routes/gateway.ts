@@ -3,10 +3,13 @@ import type { Config } from "../config.js";
 import { createApiKeyGuard } from "../plugins/apiKeyGuard.js";
 import { tenantCreateSchema, tenantUpdateSchema } from "../schemas/tenant.js";
 import { metricsQuerySchema } from "../schemas/metrics.js";
+import { metricasQuerySchema } from "../schemas/metricas.js";
 import { MlClient } from "../services/mlClient.js";
 import { TenantService } from "../services/tenantService.js";
 import { TokenManager, listEscalations } from "../services/tokenManager.js";
 import { MetricsAggregatorService } from "../services/metricsAggregator.js";
+import { mapToMetricasResponse } from "../services/metricasMapper.js";
+import type { MetricsPeriod } from "../types/metrics.js";
 
 export async function registerGatewayRoutes(
   app: FastifyInstance,
@@ -138,6 +141,42 @@ export async function registerGatewayRoutes(
         request.log.error(err);
         const message =
           err instanceof Error ? err.message : "Failed to fetch metrics";
+        return reply.code(502).send({ error: message });
+      }
+    },
+  );
+
+  app.get(
+    "/api/v1/tenants/:id/metricas",
+    { preHandler: apiKeyGuard },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const parsed = metricasQuerySchema.safeParse(request.query);
+      if (!parsed.success) {
+        return reply.code(400).send({ error: parsed.error.flatten() });
+      }
+
+      const tenant = await tenantService.getById(id);
+      if (!tenant) {
+        return reply.code(404).send({ error: "Tenant não encontrado" });
+      }
+      if (!tenant.mlUserId) {
+        return reply
+          .code(400)
+          .send({ error: "Tenant não conectado ao Mercado Livre" });
+      }
+
+      try {
+        const raw = await metricsAggregator.getTenantMetrics(
+          tenant,
+          parsed.data.periodo as MetricsPeriod,
+          parsed.data.refresh === "1",
+        );
+        return mapToMetricasResponse(raw);
+      } catch (err) {
+        request.log.error(err);
+        const message =
+          err instanceof Error ? err.message : "Falha ao obter métricas";
         return reply.code(502).send({ error: message });
       }
     },

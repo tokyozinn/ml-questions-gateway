@@ -6,7 +6,7 @@ Gateway SaaS multi-tenant de automação de respostas a perguntas do Mercado Liv
 
 | Documento | Descrição |
 |---|---|
-| [docs/SOT.md](docs/SOT.md) | Source of Truth (spec completa) — **v1.2.0** |
+| [docs/SOT.md](docs/SOT.md) | Source of Truth (spec completa) — **v1.3.0** |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Épicos, histórias e tasks |
 | [docs/adrs/](docs/adrs/) | Architecture Decision Records |
 | [docs/DEPLOY-DEMO.md](docs/DEPLOY-DEMO.md) | Guia de demo go-live (ngrok) |
@@ -21,6 +21,15 @@ Gateway SaaS multi-tenant de automação de respostas a perguntas do Mercado Liv
 ## Status
 
 **MVP demo pronto.** Siga o [guia de go-live](docs/DEPLOY-DEMO.md) para demonstração ao cliente.
+
+### Integração — métricas PT
+
+```http
+GET /api/v1/tenants/{id}/metricas?periodo=30|60|90
+X-API-Key: {GATEWAY_API_KEY}
+```
+
+Ver [DEPLOY-DEMO §7](docs/DEPLOY-DEMO.md) e ADR-TECH-004.
 
 ## Governança
 

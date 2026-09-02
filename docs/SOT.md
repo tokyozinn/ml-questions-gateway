@@ -370,12 +370,15 @@ Hotmart webhook: `POST /webhooks/billing/hotmart`
 | PATCH | /api/v1/tenants/{id} | TenantUpdate | Atualizar |
 | POST | /api/v1/tenants/{id}/disconnect | — | Desvincular ML |
 | GET | /api/v1/escalations | — | Listar perguntas escalonadas ao seller |
+| GET | /api/v1/tenants/{id}/metrics | query: `period`, `refresh` | Métricas agregadas (EN) — consumo do dash admin |
+| GET | /api/v1/tenants/{id}/metricas | query: `periodo`, `refresh` | Métricas financeiras (PT) — integração externa (ADR-TECH-004) |
 
 ### 7.3 Admin UI
 
 | Path | Descrição |
 |---|---|
 | GET /admin | Painel web (auth via API key em sessionStorage) |
+| GET /admin/metrics | Dashboard de métricas por tenant |
 
 ### 7.4 Schemas
 
@@ -695,5 +698,6 @@ Ordem de teste manual:
 | 1.0.0 | 2026-09-01 | Spec inicial target; bloqueadores P0–P2 definidos |
 | 1.1.0 | 2026-09-01 | Migração da stack de referência para Node.js/TypeScript; adição de riscos críticos (§1.4, §12.1) e requisitos derivados (nonce OAuth, cota por tenant, LGPD, homologação ML) |
 | 1.2.0 | 2026-09-01 | IA-first com contexto obrigatório do produto (§5.7, §6.3); escalonamento ao seller (§5.8); `OPENAI_API_KEY` obrigatória no MVP. ADRs: BIZ-001, BIZ-002, TECH-001, TECH-002 |
+| 1.3.0 | 2026-09-02 | Endpoint `GET /api/v1/tenants/{id}/metricas` (contrato PT para integração externa); dash permanece em `/metrics` (EN). ADR-TECH-004 |
 
 Regra: qualquer mudança de comportamento do produto deve atualizar este SOT (incrementar versão) **e** gerar ADR antes do código. Este arquivo é a fonte da verdade.

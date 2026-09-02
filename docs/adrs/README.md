@@ -48,3 +48,4 @@ ADR-{BIZ|TECH}-NNN-titulo-curto.md
 | [ADR-TECH-001](technical/ADR-TECH-001-product-context-knowledge-base.md) | Base de conhecimento por produto (item ML) | accepted |
 | [ADR-TECH-002](technical/ADR-TECH-002-seller-escalation-channel.md) | Sinalização ao seller quando IA não responde | accepted |
 | [ADR-TECH-003](technical/ADR-TECH-003-ml-metrics-aggregator.md) | Agregador de métricas ML com cache TTL | accepted |
+| [ADR-TECH-004](technical/ADR-TECH-004-metricas-integration-endpoint.md) | Endpoint `/metricas` (contrato PT para integração) | accepted |

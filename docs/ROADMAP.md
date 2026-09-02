@@ -100,6 +100,24 @@ Legenda: `[ ]` pendente | `[~]` em progresso | `[x]` concluído
 
 ---
 
+## Épico 6 — API `/metricas` (integração externa) `[x]`
+
+**Objetivo:** endpoint JSON em português para outro sistema consumir métricas financeiras por tenant.
+
+| ID | Tipo | Descrição | Status | Branch |
+|---|---|---|---|---|
+| E6-US1 | História | Como sistema externo, quero GET de métricas PT por tenant_id | [x] | |
+| E6-T1 | Task | ADR-TECH-004 + SOT + spec | [x] | |
+| E6-T2 | Task | Tipos PT + Zod + `metricasMapper` | [x] | |
+| E6-T3 | Task | `GET /api/v1/tenants/:id/metricas?periodo=30\|60\|90` | [x] | |
+| E6-T4 | Task | Doc de consumo (DEPLOY-DEMO / README) | [x] | |
+
+**ADRs:** ADR-TECH-004 (accepted)
+
+**Backlog:** JWT no lugar de (ou além de) `X-API-Key` para este endpoint.
+
+---
+
 ## Backlog pós-MVP (P0 SOT)
 
 - Fila BullMQ + Redis (retry)
